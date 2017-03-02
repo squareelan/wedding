@@ -105,7 +105,7 @@ p {line-height: 2}
           </div>
         </div>
       </div>
-      <img src="assets/images/map.png" style="width:100%;">
+      <img class="w3-padding-16" src="assets/images/map.png" style="width:90%;">
     </div>
   </div>
 </div>
@@ -126,22 +126,22 @@ p {line-height: 2}
       <span onclick="document.getElementById('id01').style.display='none'" class="w3-closebtn w3-hover-text-grey w3-margin">x</span>
       <h1 class="w3-wide">CAN YOU COME?</h1>
       <p>We really hope you can make it.</p>
-      <form>
-        <input class="w3-input w3-border" type="text" placeholder="Name(s)" name="name">
+      <form name="rsvpForm">
+        <input class="w3-input w3-border" type="text" placeholder="Name(s)" name="fname" id="nameInput">
       </form>
       <p><i>Sincerely, Bom & Yongjun</i></p>
       <div class="w3-row">
         <div class="w3-half">
-          <button onclick="document.getElementById('id01').style.display='none'" type="button" class="w3-button w3-block w3-green">Going</button>
+          <button onclick="going()" type="button" class="w3-button w3-block w3-green enableOnFormFilled" disabled="true">Going</button>
         </div>
         <div class="w3-half">
-          <button onclick="document.getElementById('id01').style.display='none'" type="button" class="w3-button w3-block w3-red">Can't come</button>
+          <button onclick="notGoing()" type="button" class="w3-button w3-block w3-red enableOnFormFilled" disabled="true">Can't come</button>
         </div>
       </div>
     </div>
   </div>
 </div>
-
+  
 <!-- Footer -->
 <footer class="w3-center w3-black w3-padding-16">
   <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
@@ -149,4 +149,96 @@ p {line-height: 2}
 <div class="w3-hide-small" style="margin-bottom:32px"> </div>
 
 </body>
+  
+<!-- jQuery -->
+<script src="http://code.jquery.com/jquery.min.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/3.7.0/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.6.10/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.6.10/firebase-database.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyD19uyDm3KDdKAAAnVYjC49YYCudbBif8k",
+    authDomain: "squareelan.firebaseapp.com",
+    databaseURL: "https://squareelan.firebaseio.com",
+    storageBucket: "squareelan.appspot.com",
+    messagingSenderId: "512924107988"
+  };
+  firebase.initializeApp(config);
+  console.log("Initialized Firebase");
+  
+  function writeGuestData(userId, name, isAttending) {
+    var group;
+    
+    if (isAttending == true) {
+      group = 'attend/'  
+    } else {
+      group = 'notAttend/'
+    }
+    
+    firebase.database().ref(group + userId).set({
+      username: name,
+      isAttending: isAttending
+    });
+  }
+  
+  function generateUUID() {
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+  };
+</script>
+<script>
+  function dismissRSVP() {
+    // Disable pop up
+    document.getElementById('id01').style.display='none';
+  }
+  
+  function formChanged() {
+    var name = document.forms["rsvpForm"]["fname"].value;
+    console.log(name)
+    
+    
+    return name != null;
+  }
+  
+  function going() {
+    var name = document.getElementById("nameInput").value;
+
+    dismissRSVP();
+
+    console.log("Going: " + name);
+    // Update to firebase
+    writeGuestData(generateUUID(), name, true);
+  }
+  
+  function notGoing() {
+    var name = document.getElementById("nameInput").value;
+
+    dismissRSVP();
+
+    console.log("Not going: " + name);
+    
+    // Update to firebase
+    writeGuestData(generateUUID(), name, false);
+  }
+  
+  $(function () {
+      $('#nameInput').keyup(function () {
+          if ($(this).val() == '' || $(this).val() == null) {
+              //Check to see if there is any text entered
+              // If there is no text within the input ten disable the button
+              $('.enableOnFormFilled').prop('disabled', true);      
+          } else {
+              //If there is text in the input, then enable the button
+              $('.enableOnFormFilled').prop('disabled', false);
+          }
+      });
+  }); 
+</script>  
 </html>
