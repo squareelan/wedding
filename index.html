@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="assets/css/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     
 <!--<base href="https://www.w3schools.com/" target="_blank">-->
 
@@ -127,7 +128,27 @@ p {line-height: 2}
       <h1 class="w3-wide">CAN YOU COME?</h1>
       <p>We really hope you can make it.</p>
       <form name="rsvpForm">
-        <input class="w3-input w3-border" type="text" placeholder="Name(s)" name="fname" id="nameInput">
+        <input class="w3-input w3-border" type="text" placeholder="성함:" name="fname" id="mainGuestName">
+        <input class="w3-input w3-border" type="text" placeholder="동행 성함:" name="fname" id="additionalGuestName">
+
+        <!-- 인원수 -->
+        <div class="btn-group" data-toggle="buttons">
+<!--      
+          <label class="btn btn-primary">
+            <input type="radio" name="options" id="option1" autocomplete="off" checked> 1
+          </label>
+          <label class="btn btn-primary">
+            <input type="radio" name="options" id="option2" autocomplete="off"> 2
+          </label>
+          <label class="btn btn-primary">
+            <input type="radio" name="options" id="option3" autocomplete="off"> 3
+          </label>
+          <label class="btn btn-primary">
+            <input type="radio" name="options" id="option3" autocomplete="off"> 4
+          </label>
+-->
+        </div>   
+                
       </form>
       <p><i>Sincerely, Bom & Yongjun</i></p>
       <div class="w3-row">
@@ -168,27 +189,33 @@ p {line-height: 2}
   firebase.initializeApp(config);
   console.log("Initialized Firebase");
   
-  function writeGuestData(userId, name, isAttending) {
+  function writeGuestData(userId, name, extra, isAttending) {
     var group;
-    
+    var totalCount = 1;
     if (isAttending == true) {
       group = 'attend/'  
     } else {
       group = 'notAttend/'
     }
     
+    if (extra != '') {
+      totalCount++;
+    }
+    
     firebase.database().ref(group + userId).set({
-      username: name,
-      isAttending: isAttending
+      guestName: name,
+      extraGuest: extra,
+      isAttending: isAttending,
+      total: totalCount
     });
   }
   
   function generateUUID() {
     var d = new Date().getTime();
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = (d + Math.random()*16)%16 | 0;
-        d = Math.floor(d/16);
-        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+      var r = (d + Math.random()*16)%16 | 0;
+      d = Math.floor(d/16);
+      return (c=='x' ? r : (r&0x3|0x8)).toString(16);
     });
     return uuid;
   };
@@ -197,47 +224,54 @@ p {line-height: 2}
   function dismissRSVP() {
     // Disable pop up
     document.getElementById('id01').style.display='none';
-  }
-  
-  function formChanged() {
-    var name = document.forms["rsvpForm"]["fname"].value;
-    console.log(name)
     
+    // Clean input fields
+    document.getElementById("mainGuestName").value = '';
+    document.getElementById("additionalGuestName").value = '';
     
-    return name != null;
+    // Disable buttons again
+    $('.enableOnFormFilled').prop('disabled', true);
   }
   
   function going() {
-    var name = document.getElementById("nameInput").value;
+    var name = document.getElementById("mainGuestName").value;
+    var add = document.getElementById("additionalGuestName").value;
 
     dismissRSVP();
 
     console.log("Going: " + name);
     // Update to firebase
-    writeGuestData(generateUUID(), name, true);
+    writeGuestData(generateUUID(), name, add, true);
   }
   
   function notGoing() {
-    var name = document.getElementById("nameInput").value;
-
+    var name = document.getElementById("mainGuestName").value;
+    var add = document.getElementById("additionalGuestName").value;
+    
     dismissRSVP();
 
     console.log("Not going: " + name);
     
     // Update to firebase
-    writeGuestData(generateUUID(), name, false);
+    writeGuestData(generateUUID(), name, add, false);
   }
   
   $(function () {
-      $('#nameInput').keyup(function () {
-          if ($(this).val() == '' || $(this).val() == null) {
-              //Check to see if there is any text entered
-              // If there is no text within the input ten disable the button
-              $('.enableOnFormFilled').prop('disabled', true);      
-          } else {
-              //If there is text in the input, then enable the button
-              $('.enableOnFormFilled').prop('disabled', false);
-          }
+      function rsvpFilled() {
+        var main = $('#mainGuestName').val();        
+        return main != '';
+      }
+    
+      $('#mainGuestName').keyup(function () {
+//          if ($(this).val() == '' || $(this).val() == null) {
+        if (!rsvpFilled()) {
+          //Check to see if there is any text entered
+          // If there is no text within the input ten disable the button
+          $('.enableOnFormFilled').prop('disabled', true);      
+        } else {
+          //If there is text in the input, then enable the button
+          $('.enableOnFormFilled').prop('disabled', false);
+        }
       });
   }); 
 </script>  
