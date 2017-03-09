@@ -149,6 +149,17 @@ p {line-height: 2}
     </div>
   </div>
 </div>
+  
+<!-- Registry section -->
+<div class="w3-container w3-padding-32 w3-center" id="registry">
+  <div class="w3-content">
+    <h1 class="w3-text-grey bomsfont">WEDDING REGISTRY</h1>
+    <div>
+      <a href="https://www.bedbathandbeyond.com/store/giftregistry/view_registry_guest.jsp?registryId=544335825&eventType=Wedding&pwsurl="><p>Go to Registry</p>
+      </a>
+    </div>
+  </div>
+</div>
 
 <!-- RSVP section -->
 <!--
@@ -317,7 +328,7 @@ p {line-height: 2}
 </script>  
 <script>
   // Set the date we're counting down to
-  var countDownDate = new Date("April 2, 2017 18:00:00").getTime();
+  var countDownDate = new Date("April 2, 2017 00:00:00").getTime();
 
   var now = new Date().getTime();
 
@@ -325,7 +336,7 @@ p {line-height: 2}
   var distance = countDownDate - now;
 
   // Time calculations for days, hours, minutes and seconds
-  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var days = Math.ceil(distance / (1000 * 60 * 60 * 24));
   var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
   var seconds = Math.floor((distance % (1000 * 60)) / 1000);
